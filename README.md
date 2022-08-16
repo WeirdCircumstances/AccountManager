@@ -17,5 +17,6 @@ oder einer anderen Methode.
 oder  
 alternativ mit poetry  
 `cat requirements.txt | xargs poetry add`  
-
-`python main.py`
+  
+Start mit  
+`python main.py`  
