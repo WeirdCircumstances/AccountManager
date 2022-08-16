@@ -6,7 +6,6 @@ authors = ["Ben"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.11"
-selenium = "^4.3.0"
 pandas = "^1.4.3"
 python-environ = "^0.4.54"
 pyinstaller = "^5.3"

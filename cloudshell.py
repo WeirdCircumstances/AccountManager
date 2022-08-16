@@ -9,33 +9,34 @@ from PySide6.QtCore import (
 )
 
 from userdata import user, behavior_control
-from web import WorkerSignals, WebHelper
+from web import WorkerSignals
+
+"""
+Toolbox
+
+status, output = subprocess.getstatusoutput('brew update')
+
+az account show
+
+az ad user create --display-name "Test Test" --password Abc12345 \
+--user-principal-name it.test1@innovative-students.de --force-change-password-next-login true
+az ad user get-member-groups --id it.test1@innovative-students.de
+
+az ad group list --display-name "Digitales Marketing"
+
+az ad user list --filter "displayname eq 'test test'"
+az ad user show --id "it.test1@innovative-students.de" --query "objectId" --output tsv
+
+az ad group member add --group Test --member-id 5f634584-87fe-407e-ba31-22871f54f8b7
 
 
-# Toolbox
-
-# status, output = subprocess.getstatusoutput('brew update')
-
-# az account show
-
-# az ad user create --display-name "Test Test" --password Abc12345 \
-# --user-principal-name it.test1@innovative-students.de --force-change-password-next-login true
-# az ad user get-member-groups --id it.test1@innovative-students.de
-
-# az ad group list --display-name "Digitales Marketing"
-
-# az ad user list --filter "displayname eq 'test test'"
-# az ad user show --id "it.test1@innovative-students.de" --query "objectId" --output tsv
-
-# az ad group member add --group Test --member-id 5f634584-87fe-407e-ba31-22871f54f8b7
-
-
-# az ad user create --display-name "Test Test" --password Abc12345 \
-# --user-principal-name it.test1@innovative-students.de --force-change-password-next-login true
-# az ad group member add --group Empfang --member-id $(az ad user show \
-# --id "it.test1@innovative-students.de" --query "objectId" --output tsv)
-# az ad group member check --group Empfang --member-id $(az ad user show \
-# --id "it.test1@innovative-students.de" --query "objectId" --output tsv) --query "value" --output tsv
+az ad user create --display-name "Test Test" --password Abc12345 \
+--user-principal-name it.test1@innovative-students.de --force-change-password-next-login true
+az ad group member add --group Empfang --member-id $(az ad user show \
+--id "it.test1@innovative-students.de" --query "objectId" --output tsv)
+az ad group member check --group Empfang --member-id $(az ad user show \
+--id "it.test1@innovative-students.de" --query "objectId" --output tsv) --query "value" --output tsv
+"""
 
 
 class ADWorker(QRunnable):
@@ -332,6 +333,7 @@ class ADWorker(QRunnable):
         def increase_row_by_one():
             if behavior_control['read_from_list']:
                 row_number = int(get_row_number())
+                # behavior_control['row']
                 row_number += 1
 
                 row_text_file = open("row_number.txt", encoding='utf-8', mode='w')
@@ -341,7 +343,6 @@ class ADWorker(QRunnable):
                 print("New row number: ")
                 behavior_control['read_from_list'] = False
                 print(row_number)
-            return
 
         def error_handler(status, output):
 
@@ -415,7 +416,6 @@ class ADmanage(QRunnable):
         user['principalName'] = ''
         print(search)
 
-        # I really don't know what this f before the string does, but it is necessary
         status, output = subprocess.getstatusoutput(
             f"az ad user list --filter \"startswith(displayName, '{search}') or \
             startswith(userPrincipalName, '{search}')\" \

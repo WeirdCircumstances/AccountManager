@@ -1,13 +1,7 @@
 import os
-
-from PySide6.QtWidgets import (
-    QWidget,
-)
-
+from PySide6.QtWidgets import (QWidget)
 from PySide6.QtCore import QRunnable
-
 from DialogWindow import Ui_DialogWindow
-
 from signals import WorkerSignals
 
 import json
@@ -96,9 +90,11 @@ class CheckPermissons(QRunnable):
             self.dialog = NeedPermissions(self.login)
             self.dialog.signals.result.connect(self.process_json)
             self.dialog.show()
+            self.signals.error.emit(f'Bitte einloggen.')
             # time.sleep(10)
         else:
             print("there is already a window")
+        self.signals.finished.emit()
 
     def process_json(self, s):
         data = read_json()
@@ -107,3 +103,4 @@ class CheckPermissons(QRunnable):
 
         write_json(data)
         self.signals.error.emit("Daten wurden gespeichert")
+

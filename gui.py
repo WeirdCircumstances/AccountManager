@@ -106,7 +106,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         self.buttonNew.setStyleSheet("QPushButton#buttonNew:hover {background-color: red;}")
         self.buttonNew.clicked.connect(self.generate_single_account)
 
-        # self.automatic_continue.stateChanged.connect(self.toggle_automatic_continue)
+        self.automatic_continue.stateChanged.connect(self.toggle_automatic_continue)
 
         # Second Tab
 
@@ -123,6 +123,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.deleteAccount.clicked.connect(self.delete_account)
         self.deleteAccount.setStyleSheet("QPushButton#deleteAccount:hover {background-color: red;}")
+
+        # get new Anmeldung Kurs.csv, afterwards read last value or jump to the end of the list, when there is no row_number file
+        self.get_new_account_List()
 
     def fname_changed(self, s):
         user['fname'] = s.lstrip().strip('\n').strip().title()
@@ -321,7 +324,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.show_error("Lade aktuelle Liste")
 
-        self.login = "Redaktion"
+        self.login = "it-fitness-Redaktion"
 
         self.permission = CheckPermissons(self.dialog, self.login)
         self.permission.signals.error.connect(self.show_error)
@@ -331,6 +334,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             worker.signals.progress.connect(self.generate_progress)
             self.show_error("")
             worker.signals.error.connect(self.show_error)
+            worker.signals.finished.connect(self.get_account_from_List)
 
             self.threadpool.start(worker)
 
@@ -344,21 +348,21 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
             print(user)
 
-            self.login = "innovative-students.de"
+            # self.login = "innovative-students.de"
 
-            self.permission = CheckPermissons(self.dialog, self.login)
-            self.permission.signals.error.connect(self.show_error)
+            # self.permission = CheckPermissons(self.dialog, self.login)
+            # self.permission.signals.error.connect(self.show_error)
 
             # self.result = self.permission.check()
 
-            if self.permission.check():
-                # worker = WebWorker()
-                worker = ADWorker()
-                worker.signals.progress.connect(self.generate_progress)
-                self.show_error("")
-                worker.signals.error.connect(self.show_error)
+            # if self.permission.check():
+            # worker = WebWorker()
+            worker = ADWorker()
+            worker.signals.progress.connect(self.generate_progress)
+            self.show_error("")
+            worker.signals.error.connect(self.show_error)
 
-                self.threadpool.start(worker)
+            self.threadpool.start(worker)
 
     def generate_progress(self, progress):
         self.progress.setValue(progress)
@@ -377,11 +381,16 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 self.getList.setEnabled(True)
                 self.get_account_from_List()
 
-    def toggle_automatic_continue(self):
+    def toggle_automatic_continue(self, s):
         # if progress == 100:
-        self.buttonNew.setEnabled(True)
-        self.readList.setEnabled(True)
-        self.getList.setEnabled(True)
+        if s:
+            self.buttonNew.setEnabled(True)
+            self.readList.setEnabled(True)
+            self.getList.setEnabled(True)
+        else:
+            self.buttonNew.setEnabled(False)
+            self.readList.setEnabled(False)
+            self.getList.setEnabled(False)
 
     def show_error(self, error):
         self.error_field.setText(error)
@@ -392,8 +401,6 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         # print(self.read_entries_from_csv)
         self.read_entries_from_csv()
-
-        behavior_control['read_from_list'] = True
 
         # self.button_toggle()
 
@@ -414,35 +421,36 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
     def get_row_number(self):
         if os.path.exists("row_number.txt"):
-            row_number = open("row_number.txt", 'r')
-            content = row_number.readline()
-            row_number.close()
-            behavior_control['row'] = int(content)
-            # print(behavior_control)
-            return content
+            content = open("row_number.txt", 'r')
+            row_number = content.readline()
+            behavior_control['row'] = int(row_number)
+            content.close()
+            return int(row_number)
         else:
-            self.show_error("Bitte zuerst eine Zeile nennen!")
+            self.show_error("Bitte eine Zeile nennen!")
+        return 10000
 
     def row_changed(self, s):
+        s = int(s)
         behavior_control['row'] = s
         row_number = open("row_number.txt", 'w')
-        row_number.write(s)
+        row_number.write(str(s))
         row_number.close()
         self.buttonNew.setEnabled(False)
+
+    def check_or_update_credentials(self, hole_csv):
+        self.permission = CheckPermissons(self.dialog, self.login)
+        self.permission.signals.error.connect(self.show_error)
+        self.permission.get_permissions()
+        self.permission.signals.finished.connect(self.read_entries_from_csv)
+        return
 
     def read_entries_from_csv(self):
         self.clear_ui()
 
         row_number = self.get_row_number()
-        row_number = int(row_number)
-
-        self.row_field.setText(str(behavior_control['row']))
-
-        print("This is row: " + str(row_number))
 
         csv_path = os.path.join(os.getcwd(), "Anmeldung Kurs.csv")
-
-        # self.show_error(csv_path)
 
         # header needs to match now broken csv (since row 2660)
         # tel line was deleted
@@ -451,22 +459,30 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         hole_csv = pd.read_csv(csv_path, names=col_names)
 
-        len_list = len(hole_csv) + 1
-        print("List length: " + str(len_list))
-        self.list_field.setText(str(len_list))
-
-        if int(behavior_control['row']) > len_list:
-            self.show_error("Liste hat keine weiteren Einträge")
-            self.automatic_continue.setChecked(False)
-            self.forward.setEnabled(False)
-            self.readList.setEnabled(False)
-
+        check_csv = hole_csv.iloc[0, 0]
+        if check_csv != "firstName":
+            self.check_or_update_credentials(hole_csv)
         else:
+            print(f"Line output {check_csv}")
+            len_list = len(hole_csv)
+            print(f"This is line: {row_number} / {len_list}")
+
+            if row_number >= len_list:
+                self.show_error("Ende der Liste")
+                self.automatic_continue.setChecked(False)
+                self.readList.setEnabled(False)
+                self.forward.setEnabled(False)
+                behavior_control['read_from_list'] = False
+                row_number = len_list
+                self.row_changed(row_number)
+            else:
+                behavior_control['read_from_list'] = True
+
+            self.row_field.setText(str(row_number))
+            self.list_field.setText(str(len_list))
 
             # adjust row number to match the actual table
-            row_number -= 2
-
-            # print(hole_csv.loc[[row_number]])
+            row_number -= 1
 
             user['fname'] = hole_csv.at[row_number, 'firstName'].title().strip()
             self.fname.setText(user['fname'])
@@ -573,8 +589,8 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if 'Kollaboration über Teams' in all_courses:
                     user['Kollaboration über Teams'] = 2
 
-        self.buttonNew.setEnabled(True)
-        self.readList.setEnabled(True)
+            self.buttonNew.setEnabled(True)
+            self.readList.setEnabled(True)
 
     def clear_ui(self):
         user['fname'] = ''
@@ -667,8 +683,3 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         print("toggle is now: " + str(user['toggled']))
 
         self.buttonNew.setEnabled(user['toggled'])
-
-    # read Excel
-    # def return_pressed(self):
-    # print("Return pressed!")
-    # self.centralWidget().setText("BOOM!")

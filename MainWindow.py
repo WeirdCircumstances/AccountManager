@@ -16,11 +16,11 @@ from PySide6.QtGui import (QAction, QBrush, QColor, QConicalGradient,
     QIcon, QImage, QKeySequence, QLinearGradient,
     QPainter, QPalette, QPixmap, QRadialGradient,
     QTransform)
-from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QGridLayout,
-    QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-    QMainWindow, QMenu, QMenuBar, QProgressBar,
-    QPushButton, QSizePolicy, QSpacerItem, QTabWidget,
-    QTextBrowser, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QGridLayout, QGroupBox,
+    QHBoxLayout, QLabel, QLineEdit, QMainWindow,
+    QMenu, QMenuBar, QProgressBar, QPushButton,
+    QSizePolicy, QSpacerItem, QTabWidget, QTextBrowser,
+    QWidget)
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -131,14 +131,6 @@ class Ui_MainWindow(object):
         self.telephone.setClearButtonEnabled(True)
 
         self.gridLayout_5.addWidget(self.telephone, 2, 1, 1, 1)
-
-        self.comboBox = QComboBox(self.groupBox_2)
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.addItem("")
-        self.comboBox.setObjectName(u"comboBox")
-
-        self.gridLayout_5.addWidget(self.comboBox, 5, 1, 1, 1)
 
         self.uid = QLineEdit(self.groupBox_2)
         self.uid.setObjectName(u"uid")
@@ -401,10 +393,6 @@ class Ui_MainWindow(object):
         self.groupBox_2.setTitle(QCoreApplication.translate("MainWindow", u"Stammdaten", None))
         self.lname.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Nachname", None))
         self.telephone.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Telefon", None))
-        self.comboBox.setItemText(0, QCoreApplication.translate("MainWindow", u"@innovative-students.de", None))
-        self.comboBox.setItemText(1, QCoreApplication.translate("MainWindow", u"@code-your-life.org", None))
-        self.comboBox.setItemText(2, QCoreApplication.translate("MainWindow", u"@das-lernzentrum.de", None))
-
         self.uid.setPlaceholderText(QCoreApplication.translate("MainWindow", u"ID (Standard: it, - f\u00fcr leer)", None))
         self.fname.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Vorname", None))
         self.mail.setPlaceholderText(QCoreApplication.translate("MainWindow", u"E-Mail", None))
