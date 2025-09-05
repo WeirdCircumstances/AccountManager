@@ -333,16 +333,16 @@
               </widget>
              </item>
              <item row="6" column="0">
-              <widget class="QCheckBox" name="dig_arbeitsplatz">
+              <widget class="QCheckBox" name="verwaltungsassistenz">
                <property name="text">
-                <string>Digitaler Arbeitsplatz</string>
+                <string>Verwaltungsassistenz</string>
                </property>
               </widget>
              </item>
              <item row="7" column="0">
-              <widget class="QCheckBox" name="it_administration">
+              <widget class="QCheckBox" name="system_administration">
                <property name="text">
-                <string>IT-Administration</string>
+                <string>System-Administration</string>
                </property>
               </widget>
              </item>
@@ -538,7 +538,7 @@
      <x>0</x>
      <y>0</y>
      <width>442</width>
-     <height>43</height>
+     <height>37</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu_Einstellungen">

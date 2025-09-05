@@ -16,8 +16,8 @@ user = {
     'grafikdesign': '',
     'diversity': '',
     'finanzanalyse': '',
-    'dig_arbeitsplatz': '',
-    'it_administration': '',
+    'Verwaltungsassistenz': '',
+    'System-Administration': '',
     'projektmanagement': '',
     'dig_marketing': '',
     'mc_adf': '',
@@ -40,10 +40,14 @@ user = {
     'Jobsuche perfektionieren': '',
     'Selbstmanagement lernen': '',
     'Kollaboration über Teams': '',
+    'Unternehmertum': '',
+    'Digitale Grundlagen': '',
+    'Business-Analyse': '',
     'license': 2,
 }
 
 behavior_control = {
     'read_from_list': False,
-    'headless_browser': True
+    'headless_browser': True,
+    'list_end_reached_and_worker_finished': False,
 }

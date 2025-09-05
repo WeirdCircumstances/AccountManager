@@ -12,4 +12,6 @@ QtPy
 six
 urllib3
 xlrd
+python-environ
+requests
 

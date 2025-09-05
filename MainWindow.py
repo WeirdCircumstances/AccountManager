@@ -218,15 +218,15 @@ class Ui_MainWindow(object):
 
         self.gridLayout_3.addWidget(self.soft_skills, 2, 1, 1, 1)
 
-        self.dig_arbeitsplatz = QCheckBox(self.groupBox)
-        self.dig_arbeitsplatz.setObjectName(u"dig_arbeitsplatz")
+        self.verwaltungsassistenz = QCheckBox(self.groupBox)
+        self.verwaltungsassistenz.setObjectName(u"verwaltungsassistenz")
 
-        self.gridLayout_3.addWidget(self.dig_arbeitsplatz, 6, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.verwaltungsassistenz, 6, 0, 1, 1)
 
-        self.it_administration = QCheckBox(self.groupBox)
-        self.it_administration.setObjectName(u"it_administration")
+        self.system_administration = QCheckBox(self.groupBox)
+        self.system_administration.setObjectName(u"system_administration")
 
-        self.gridLayout_3.addWidget(self.it_administration, 7, 0, 1, 1)
+        self.gridLayout_3.addWidget(self.system_administration, 7, 0, 1, 1)
 
         self.projektmanagement = QCheckBox(self.groupBox)
         self.projektmanagement.setObjectName(u"projektmanagement")
@@ -358,7 +358,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 442, 43))
+        self.menubar.setGeometry(QRect(0, 0, 442, 37))
         self.menu_Einstellungen = QMenu(self.menubar)
         self.menu_Einstellungen.setObjectName(u"menu_Einstellungen")
         MainWindow.setMenuBar(self.menubar)
@@ -408,8 +408,8 @@ class Ui_MainWindow(object):
         self.finanzanalyse.setText(QCoreApplication.translate("MainWindow", u"Finanzanalyse", None))
         self.dynamics.setText(QCoreApplication.translate("MainWindow", u"Dynamics 365", None))
         self.soft_skills.setText(QCoreApplication.translate("MainWindow", u"Soft Skills", None))
-        self.dig_arbeitsplatz.setText(QCoreApplication.translate("MainWindow", u"Digitaler Arbeitsplatz", None))
-        self.it_administration.setText(QCoreApplication.translate("MainWindow", u"IT-Administration", None))
+        self.verwaltungsassistenz.setText(QCoreApplication.translate("MainWindow", u"Verwaltungsassistenz", None))
+        self.system_administration.setText(QCoreApplication.translate("MainWindow", u"System-Administration", None))
         self.projektmanagement.setText(QCoreApplication.translate("MainWindow", u"Projektmanagement", None))
         self.empfang.setText(QCoreApplication.translate("MainWindow", u"Empfang", None))
         self.jobcoaching.setText(QCoreApplication.translate("MainWindow", u"Jobcoaching", None))

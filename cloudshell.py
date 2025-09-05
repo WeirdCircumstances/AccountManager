@@ -1,6 +1,8 @@
+import os
 import subprocess
 import time
 from csv import writer
+from datetime import datetime
 
 from PySide6.QtCore import (
     QRunnable,
@@ -54,7 +56,7 @@ class ADWorker(QRunnable):
     @Slot()
     def run(self):
 
-        row_content = [''] * 40
+        row_content = [''] * 50
 
         def login():
             status, output = subprocess.getstatusoutput("az account show")
@@ -104,6 +106,7 @@ class ADWorker(QRunnable):
                 self.signals.progress.emit(20)
                 row_content[9] = user['it_mail'] + domain
                 row_content[10] = user['passwd']
+                row_content[4] = str(datetime.now())
 
                 addLicense()
                 return
@@ -180,11 +183,11 @@ class ADWorker(QRunnable):
             if user['finanzanalyse'] == 2:
                 group_list.append("Finanzanalyse")
                 row_content[16] = 'x'
-            if user['dig_arbeitsplatz'] == 2:
-                group_list.append("Digitaler Arbeitsplatz")
+            if user['Verwaltungsassistenz'] == 2: # Verwaltungsassistenz
+                group_list.append("Verwaltungsassistenz")
                 row_content[17] = 'x'
-            if user['it_administration'] == 2:
-                group_list.append("IT-Administration")
+            if user['System-Administration'] == 2:
+                group_list.append("System-Administration")
                 row_content[18] = 'x'
             if user['projektmanagement'] == 2:
                 group_list.append("Projektmanagement")
@@ -205,7 +208,7 @@ class ADWorker(QRunnable):
                 group_list.append("Soft Skills")
                 row_content[24] = 'x'
             if user['jobcoaching'] == 2:
-                group_list.append("Jobsuche")
+                group_list.append("Jobcoaching")
                 row_content[25] = 'x'
             if user['mc_aaf'] == 2:
                 group_list.append("Azure AI")
@@ -242,6 +245,13 @@ class ADWorker(QRunnable):
                 row_content[38] = 'x'
             else:
                 self.signals.error.emit("❌ Keine Gruppen ausgewählt!")
+
+            group_list.append("Unternehmertum") # Unternehmertum
+            row_content[39] = 'x'
+            group_list.append("Digitale Grundlagen") # Digitale Grundlagen
+            row_content[40] = 'x'
+            group_list.append("Business-Analyse") # Business-Analyse
+            row_content[41] = 'x'
 
             self.signals.progress.emit(60)
 
@@ -287,6 +297,7 @@ class ADWorker(QRunnable):
                 else:
                     self.signals.progress.emit(60 + (38 * ((nr + 1) / list_length)))
                     self.signals.error.emit("👍 " + group + " vorhanden")
+                    print("existing: " + group)
                     # time.sleep(1)
 
                 # status, output = subprocess.getstatusoutput(
@@ -302,12 +313,17 @@ class ADWorker(QRunnable):
 
         def write_and_close():
             self.signals.progress.emit(99)
+
             self.signals.error.emit("Schreibe csv...")
 
             write_csv()
             time.sleep(0.2)  # slow enough to read output
 
             self.signals.progress.emit(100)
+
+            # when all is finished, the csv is opening. "behavior_control" tells me, when the end of the list is reached.
+            # if not behavior_control['read_from_list']:
+            #     os.system('open /Applications/LibreOffice.app /Users/ben/Nextcloud/Programming/AccountManager/newAccounts.csv')
             # self.signals.error.emit("✅ Fertig!")
             return
 
@@ -393,6 +409,8 @@ class ADWorker(QRunnable):
                 # sys.exit()
 
         login()
+        # when finished, the signal is emitted and the csv file will open (triggered by the gui file)
+        self.signals.finished.emit()
 
 
 class ADmanage(QRunnable):
@@ -416,25 +434,37 @@ class ADmanage(QRunnable):
         user['principalName'] = ''
         print(search)
 
-        status, output = subprocess.getstatusoutput(
+        status1, userPrincipalName = subprocess.getstatusoutput(
             f"az ad user list --filter \"startswith(displayName, '{search}') or \
             startswith(userPrincipalName, '{search}')\" \
             --query \"[].userPrincipalName\" \
             --output tsv \
             2>nul ")
 
-        output_length = len(output)
+        output_length = len(userPrincipalName)
 
-        if (1 < output_length < 50) & ('@' in output):
-            self.signals.error.emit("Gültige Emailadresse erkannt: \n \n" + output)
-            user['principalName'] = output
+        if (1 < output_length < 50) & ('@' in userPrincipalName):
+            self.signals.error.emit("Gültige Emailadresse erkannt: \n \n" + userPrincipalName)
+            user['principalName'] = userPrincipalName
+
+            # displayName
+            status2, displayName = subprocess.getstatusoutput(
+                f"az ad user list --filter \"startswith(displayName, '{search}') or \
+                startswith(userPrincipalName, '{search}')\" \
+                --query \"[].displayName\" \
+                --output tsv \
+                2>nul ")
+            print(f'displayName: {displayName}')
+            user['displayName'] = displayName
+
+
         elif search == '':
             self.signals.error.emit("Zuerst einen Suchbegriff eingeben.")
         else:
-            self.signals.error.emit(output)
+            self.signals.error.emit(userPrincipalName)
 
-        print(len(output))
-        print("output: " + output)
+        print(len(userPrincipalName))
+        print(f"userPrincipalName: {userPrincipalName}")
 
     def set_passwd(self, passwd):
 
@@ -448,15 +478,18 @@ class ADmanage(QRunnable):
             status, output = subprocess.getstatusoutput(
                 f"az ad user update \
                 --id {user['principalName']} \
-                --force-change-password-next-login {force_change_passwd} \
+                --force-change-password-next-sign-in {force_change_passwd} \
                 --password \'{passwd}\' \
             ")
 
             self.signals.error.emit(
-                user['principalName'] + "\n" +
-                passwd + "\n" + "\n" +
+                user['principalName'] + "\n \n" +
+                "Hallo " + user['displayName'] + ",\n \n" +
+                "die neuen Zugangsdaten lauten: \n \n" +
                 "Adresse: " + user['principalName'] + "\n" +
-                "Passwort: " + passwd + "\n" + "\n" +
+                "Passwort: " + passwd + "\n \n" +
+                "Das Passwort muss nach der ersten Anmeldung geändert werden. \n \n" +
+                "Viele Grüße, \nBenjamin Beuster \n \n" +
                 "Temporäres Passwort: " + force_change_passwd + "\n" + "\n" +
                 output
             )

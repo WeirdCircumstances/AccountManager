@@ -60,9 +60,9 @@ class MainWindow(QMainWindow, Ui_MainWindow):
 
         self.finanzanalyse.stateChanged.connect(self.finanzanalyse_toggle)
 
-        self.dig_arbeitsplatz.stateChanged.connect(self.dig_arbeitsplatz_toggle)
+        self.verwaltungsassistenz.stateChanged.connect(self.verwaltungsassistenz_toggle)
 
-        self.it_administration.stateChanged.connect(self.it_administration_toggle)
+        self.system_administration.stateChanged.connect(self.system_administration_toggle)
 
         self.projektmanagement.stateChanged.connect(self.projektmanagement_toggle)
 
@@ -173,11 +173,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
     def finanzanalyse_toggle(self, s):
         user['finanzanalyse'] = s
 
-    def dig_arbeitsplatz_toggle(self, s):
-        user['dig_arbeitsplatz'] = s
+    def verwaltungsassistenz_toggle(self, s):
+        user['Verwaltungsassistenz'] = s
 
-    def it_administration_toggle(self, s):
-        user['it_administration'] = s
+    def system_administration_toggle(self, s):
+        user['System-Administration'] = s
 
     def projektmanagement_toggle(self, s):
         user['projektmanagement'] = s
@@ -361,8 +361,24 @@ class MainWindow(QMainWindow, Ui_MainWindow):
             worker.signals.progress.connect(self.generate_progress)
             self.show_error("")
             worker.signals.error.connect(self.show_error)
+            # worker.signals.finished.connect(self.finished_and_open_file)
 
             self.threadpool.start(worker)
+
+    def finished_and_open_file(self):
+        """
+        First, the end of list will technically be reached, the last account will be generated. Only after this last step, the csb should open.
+        To get this behavior, a second variable is used to accomplish this.
+        """
+
+        if behavior_control['list_end_reached_and_worker_finished']:
+            os.system('open /Applications/LibreOffice.app /Users/ben/Nextcloud/Programming/AccountManager/newAccounts.csv')
+            os.system(
+                'open https://hwmedia.sharepoint.com/sites/ITFitness-InnovativeStudents/Freigegebene%20Dokumente/Innovative%20Students/Accounts/TN_Liste_2023.xlsx \
+                -a /Applications/Microsoft\ Excel.app')
+
+        behavior_control['list_end_reached_and_worker_finished'] = True
+        return
 
     def generate_progress(self, progress):
         self.progress.setValue(progress)
@@ -475,6 +491,7 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 behavior_control['read_from_list'] = False
                 row_number = len_list
                 self.row_changed(row_number)
+                self.finished_and_open_file()
             else:
                 behavior_control['read_from_list'] = True
 
@@ -524,12 +541,12 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                 if 'Finanzanalyse' in all_courses:
                     user['finanzanalyse'] = 2
                     self.finanzanalyse.setChecked(True)
-                if 'Digitaler Arbeitsplatz' in all_courses:
-                    user['dig_arbeitsplatz'] = 2
-                    self.dig_arbeitsplatz.setChecked(True)
+                if 'Verwaltungsassistenz' in all_courses:
+                    user['Verwaltungsassistenz'] = 2
+                    self.verwaltungsassistenz.setChecked(True)
                 if 'IT-Administration' in all_courses:
-                    user['it_administration'] = 2
-                    self.it_administration.setChecked(True)
+                    user['System-Administration'] = 2
+                    self.system_administration.setChecked(True)
                 if 'Projektmanagement' in all_courses:
                     user['projektmanagement'] = 2
                     self.projektmanagement.setChecked(True)
@@ -588,6 +605,15 @@ class MainWindow(QMainWindow, Ui_MainWindow):
                     user['Selbstmanagement lernen'] = 2
                 if 'Kollaboration über Teams' in all_courses:
                     user['Kollaboration über Teams'] = 2
+                    """
+                    New courses. Not jet shown in UI. Not needed??
+                    """
+                if 'Unternehmertum' in all_courses:
+                    user['Unternehmertum'] = 2
+                if 'Digitale Grundlagen' in all_courses:
+                    user['Digitale Grundlagen'] = 2
+                if 'Business-Analyse' in all_courses:
+                    user['Business-Analyse'] = 2
 
             self.buttonNew.setEnabled(True)
             self.readList.setEnabled(True)
@@ -626,11 +652,11 @@ class MainWindow(QMainWindow, Ui_MainWindow):
         user['finanzanalyse'] = ''
         self.finanzanalyse.setChecked(False)
 
-        user['dig_arbeitsplatz'] = ''
-        self.dig_arbeitsplatz.setChecked(False)
+        user['Verwaltungsassistenz'] = ''
+        self.verwaltungsassistenz.setChecked(False)
 
-        user['it_administration'] = ''
-        self.it_administration.setChecked(False)
+        user['System-Administration'] = ''
+        self.system_administration.setChecked(False)
 
         user['projektmanagement'] = ''
         self.projektmanagement.setChecked(False)

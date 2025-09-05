@@ -91,6 +91,26 @@ class Downloader(QRunnable):
                 print("Keine Verbindung zur Webseite")
                 return
 
+            file_url = 'https://www.it-fitness.de/redaktion/ext/modules/EmailTemplates/redaktion/show.php?id=25&export'
+
+            try:
+                resp = session.get(file_url, stream=True)
+
+                if resp.status_code == 200:
+                    filename = 'Anmeldung_Kurs_mobil.csv'
+                    with open(filename, 'wb') as f:
+                        for chunk in resp.iter_content(chunk_size=1024):
+                            if chunk:
+                                f.write(chunk)
+
+                    self.signals.finished.emit()  # fires on success, read list afterwards
+                else:
+                    self.signals.error.emit("❌ Keine Verbindung zur Webseite")
+            except ConnectionError:
+                self.signals.error.emit("❌ Keine Verbindung zur Webseite")
+                print("Keine Verbindung zur Webseite")
+                return
+
             self.signals.progress.emit(100)
 
         def runner():
